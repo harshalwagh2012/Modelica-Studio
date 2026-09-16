@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ModelicaStudio.UI.Views.NewClassDialog"
+        Title="New Modelica Class"
+        Width="480"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFFFFF">
+  <Grid RowDefinitions="Auto,Auto" Margin="24">
+    <StackPanel Spacing="14">
+      <StackPanel Spacing="5">
+        <TextBlock Text="Name" FontWeight="SemiBold" />
+        <TextBox x:Name="NameField" PlaceholderText="MyModel" />
+      </StackPanel>
+      <StackPanel Spacing="5">
+        <TextBlock Text="Class type" FontWeight="SemiBold" />
+        <ComboBox x:Name="ClassTypeField" />
+      </StackPanel>
+      <StackPanel Spacing="5">
+        <TextBlock Text="Description" FontWeight="SemiBold" />
+        <TextBox x:Name="DescriptionField" PlaceholderText="Optional description" />
+      </StackPanel>
+      <StackPanel Spacing="5">
+        <TextBlock Text="Within package" FontWeight="SemiBold" />
+        <TextBox x:Name="WithinField" PlaceholderText="Optional.Package.Name" />
+      </StackPanel>
+      <TextBlock x:Name="ValidationMessage" Foreground="#A33A3A" TextWrapping="Wrap" IsVisible="False" />
+    </StackPanel>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,22,0,0">
+      <Button Content="Cancel" Click="HandleCancel" MinWidth="84" />
+      <Button Content="Create" Click="HandleCreate" MinWidth="84" Background="#263746" Foreground="#FFFFFF" />
+    </StackPanel>
+  </Grid>
+</Window>

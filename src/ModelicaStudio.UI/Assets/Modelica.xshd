@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SyntaxDefinition name="Modelica"
+                  extensions=".mo"
+                  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A737D" fontStyle="italic" />
+  <Color name="String" foreground="#8A3B12" />
+  <Color name="Number" foreground="#005CC5" />
+  <Color name="Keyword" foreground="#5A3E9C" fontWeight="bold" />
+  <Color name="BuiltinType" foreground="#006E75" fontWeight="bold" />
+  <Color name="Annotation" foreground="#9A6700" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    <Span color="String" begin="&quot;" end="&quot;" escapeCharacter="\" />
+
+    <Keywords color="Keyword">
+      <Word>algorithm</Word>
+      <Word>and</Word>
+      <Word>block</Word>
+      <Word>break</Word>
+      <Word>class</Word>
+      <Word>connect</Word>
+      <Word>connector</Word>
+      <Word>constant</Word>
+      <Word>constrainedby</Word>
+      <Word>der</Word>
+      <Word>discrete</Word>
+      <Word>each</Word>
+      <Word>else</Word>
+      <Word>elseif</Word>
+      <Word>elsewhen</Word>
+      <Word>encapsulated</Word>
+      <Word>end</Word>
+      <Word>enumeration</Word>
+      <Word>equation</Word>
+      <Word>expandable</Word>
+      <Word>extends</Word>
+      <Word>external</Word>
+      <Word>false</Word>
+      <Word>final</Word>
+      <Word>flow</Word>
+      <Word>for</Word>
+      <Word>function</Word>
+      <Word>if</Word>
+      <Word>impure</Word>
+      <Word>in</Word>
+      <Word>initial</Word>
+      <Word>inner</Word>
+      <Word>input</Word>
+      <Word>loop</Word>
+      <Word>model</Word>
+      <Word>not</Word>
+      <Word>operator</Word>
+      <Word>or</Word>
+      <Word>outer</Word>
+      <Word>output</Word>
+      <Word>package</Word>
+      <Word>parameter</Word>
+      <Word>partial</Word>
+      <Word>protected</Word>
+      <Word>public</Word>
+      <Word>pure</Word>
+      <Word>record</Word>
+      <Word>redeclare</Word>
+      <Word>replaceable</Word>
+      <Word>return</Word>
+      <Word>stream</Word>
+      <Word>then</Word>
+      <Word>true</Word>
+      <Word>type</Word>
+      <Word>when</Word>
+      <Word>while</Word>
+      <Word>within</Word>
+    </Keywords>
+
+    <Keywords color="BuiltinType">
+      <Word>Boolean</Word>
+      <Word>Clock</Word>
+      <Word>Integer</Word>
+      <Word>Real</Word>
+      <Word>String</Word>
+    </Keywords>
+
+    <Keywords color="Annotation">
+      <Word>annotation</Word>
+      <Word>Diagram</Word>
+      <Word>Documentation</Word>
+      <Word>Icon</Word>
+      <Word>Placement</Word>
+      <Word>experiment</Word>
+    </Keywords>
+
+    <Rule color="Number">\b(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

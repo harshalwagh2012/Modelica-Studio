@@ -1,0 +1,41 @@
+{
+  "name": "M",
+  "restriction": "model",
+  "annotation": {
+    "Icon": {
+      "graphics": [
+        {
+          "$error": "Variable x not found in scope M.",
+          "value": {
+            "$kind": "call",
+            "name": "Rectangle",
+            "namedArgs": {
+              "extent": [[1, 1], [2, "x"]]
+            }
+          }
+        },
+        {
+          "$kind": "record",
+          "name": "Text",
+          "elements": [
+            true,
+            [0, 0],
+            0,
+            [0, 0, 0],
+            [0, 0, 0],
+            { "$kind": "enum", "name": "LinePattern.Solid", "index": 2 },
+            { "$kind": "enum", "name": "FillPattern.None", "index": 1 },
+            0.25,
+            [[-10, -10], [10, 10]],
+            "str",
+            0,
+            [-1, -1, -1],
+            "",
+            [],
+            { "$kind": "enum", "name": "TextAlignment.Center", "index": 2 }
+          ]
+        }
+      ]
+    }
+  }
+}

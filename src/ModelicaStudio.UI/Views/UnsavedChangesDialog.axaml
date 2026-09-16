@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ModelicaStudio.UI.Views.UnsavedChangesDialog"
+        Title="Unsaved Changes"
+        Width="500"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFFFFF">
+  <Grid RowDefinitions="Auto,Auto" Margin="24">
+    <StackPanel Spacing="9">
+      <TextBlock Text="Save changes before continuing?" FontSize="17" FontWeight="SemiBold" />
+      <TextBlock x:Name="DocumentMessage"
+                 Foreground="#555555"
+                 TextWrapping="Wrap" />
+      <TextBlock Text="If you discard the changes, they cannot be recovered."
+                 Foreground="#777773"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8"
+                Margin="0,24,0,0">
+      <Button Content="Cancel" Click="HandleCancel" MinWidth="88" />
+      <Button Content="Discard Changes" Click="HandleDiscard" MinWidth="128" />
+      <Button Content="Save"
+              Click="HandleSave"
+              MinWidth="88"
+              Background="#263746"
+              Foreground="#FFFFFF" />
+    </StackPanel>
+  </Grid>
+</Window>

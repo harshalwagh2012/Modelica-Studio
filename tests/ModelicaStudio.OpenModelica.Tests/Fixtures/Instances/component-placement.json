@@ -1,0 +1,150 @@
+{
+  "name": "Fixture.System",
+  "restriction": "model",
+  "annotation": {
+    "Diagram": {
+      "coordinateSystem": {
+        "extent": [[-100, -100], [100, 100]],
+        "preserveAspectRatio": true
+      }
+    }
+  },
+  "elements": [
+    {
+      "$kind": "extends",
+      "baseClass": {
+        "name": "Fixture.BaseSystem",
+        "restriction": "model",
+        "elements": [
+          {
+            "$kind": "component",
+            "name": "inheritedSource",
+            "type": "Real",
+            "annotation": {
+              "Placement": {
+                "transformation": { "extent": [[-90, -10], [-70, 10]] }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "$kind": "component",
+      "name": "plant",
+      "type": {
+        "name": "Fixture.Plant",
+        "restriction": "model",
+        "elements": [
+          {
+            "$kind": "component",
+            "name": "output",
+            "type": {
+              "name": "Fixture.SignalPort",
+              "restriction": "connector",
+              "prefixes": { "direction": "output" },
+              "elements": [
+                { "$kind": "component", "name": "signal", "type": "Real" }
+              ],
+              "annotation": {
+                "Icon": {
+                  "coordinateSystem": { "extent": [[-100, -100], [100, 100]] },
+                  "graphics": [
+                    {
+                      "$kind": "record",
+                      "name": "Ellipse",
+                      "elements": [true, [0, 0], 0, [0, 0, 127], [255, 255, 255], {"$kind":"enum","name":"LinePattern.Solid"}, {"$kind":"enum","name":"FillPattern.Solid"}, 0.25, [[-100, 100], [100, -100]], 0, 360, {"$kind":"enum","name":"EllipseClosure.Chord"}]
+                    }
+                  ]
+                }
+              }
+            },
+            "annotation": {
+              "Placement": {
+                "transformation": { "origin": [100, 0], "extent": [[-10, -10], [10, 10]] },
+                "iconTransformation": { "origin": [100, 0], "extent": [[-10, -10], [10, 10]] }
+              }
+            }
+          }
+        ],
+        "annotation": {
+          "Icon": {
+            "coordinateSystem": { "extent": [[-100, -100], [100, 100]] },
+            "graphics": [
+              {
+                "$kind": "record",
+                "name": "Rectangle",
+                "elements": [true, [0, 0], 0, [0, 0, 127], [220, 230, 255], {"$kind":"enum","name":"LinePattern.Solid"}, {"$kind":"enum","name":"FillPattern.Solid"}, 0.5, {"$kind":"enum","name":"BorderPattern.None"}, [[-100, 100], [100, -100]], 0]
+              }
+            ]
+          }
+        }
+      },
+      "prefixes": { "final": true },
+      "annotation": {
+        "Placement": {
+          "visible": true,
+          "transformation": {
+            "origin": [20, 30],
+            "extent": [[-20, -10], [20, 10]],
+            "rotation": 90
+          }
+        }
+      }
+    },
+    {
+      "$kind": "component",
+      "name": "port",
+      "type": {
+        "name": "Fixture.Port",
+        "restriction": "connector",
+        "elements": [
+          {
+            "$kind": "component",
+            "name": "signal",
+            "type": "Real",
+            "dims": { "absyn": [2], "typed": [2] }
+          }
+        ],
+        "annotation": {
+          "Icon": {
+            "graphics": [
+              {
+                "$kind": "record",
+                "name": "Ellipse",
+                "elements": [true, [0, 0], 0, [0, 0, 0], [255, 255, 255], {"$kind":"enum","name":"LinePattern.Solid"}, {"$kind":"enum","name":"FillPattern.Solid"}, 0.25, [[-100, 100], [100, -100]], 0, 360, {"$kind":"enum","name":"EllipseClosure.Chord"}]
+              }
+            ]
+          }
+        }
+      },
+      "prefixes": { "public": false, "direction": "input" },
+      "annotation": {
+        "Placement": {
+          "transformation": { "extent": [[70, -10], [90, 10]] },
+          "iconTransformation": { "origin": [100, 0], "extent": [[-10, -10], [10, 10]] }
+        }
+      }
+    }
+  ],
+  "connections": [
+    {
+      "lhs": { "$kind": "cref", "parts": [{"name": "plant"}, {"name": "output"}] },
+      "rhs": { "$kind": "cref", "parts": [{"name": "port"}, {"name": "signal", "subscripts": [1]}] },
+      "annotation": {
+        "Line": {
+          "points": [[40, 30], [60, 30], [60, 0], [80, 0]],
+          "color": [0, 0, 255],
+          "pattern": { "$kind": "enum", "name": "LinePattern.Dash" },
+          "thickness": 0.5,
+          "arrow": [
+            { "$kind": "enum", "name": "Arrow.Open" },
+            { "$kind": "enum", "name": "Arrow.Filled" }
+          ],
+          "arrowSize": 4,
+          "smooth": { "$kind": "enum", "name": "Smooth.Bezier" }
+        }
+      }
+    }
+  ]
+}

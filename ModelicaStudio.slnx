@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ModelicaStudio.Application/ModelicaStudio.Application.csproj" />
+    <Project Path="src/ModelicaStudio.Desktop/ModelicaStudio.Desktop.csproj" />
+    <Project Path="src/ModelicaStudio.Domain/ModelicaStudio.Domain.csproj" />
+    <Project Path="src/ModelicaStudio.Infrastructure/ModelicaStudio.Infrastructure.csproj" />
+    <Project Path="src/ModelicaStudio.OpenModelica/ModelicaStudio.OpenModelica.csproj" />
+    <Project Path="src/ModelicaStudio.UI/ModelicaStudio.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ModelicaStudio.Application.Tests/ModelicaStudio.Application.Tests.csproj" />
+    <Project Path="tests/ModelicaStudio.Domain.Tests/ModelicaStudio.Domain.Tests.csproj" />
+    <Project Path="tests/ModelicaStudio.IntegrationTests/ModelicaStudio.IntegrationTests.csproj" />
+    <Project Path="tests/ModelicaStudio.OpenModelica.Tests/ModelicaStudio.OpenModelica.Tests.csproj" />
+    <Project Path="tests/ModelicaStudio.UI.Tests/ModelicaStudio.UI.Tests.csproj" />
+  </Folder>
+</Solution>

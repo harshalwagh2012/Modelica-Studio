@@ -1,0 +1,506 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:ModelicaStudio.UI.Controls"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:modeling="using:ModelicaStudio.Domain.Modeling"
+        xmlns:vm="using:ModelicaStudio.UI.ViewModels"
+        x:Class="ModelicaStudio.UI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Width="1440"
+        Height="900"
+        MinWidth="1050"
+        MinHeight="680"
+        Background="#FFFFFF">
+  <Window.Styles>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#646464" />
+      <Setter Property="LetterSpacing" Value="1.2" />
+    </Style>
+    <Style Selector="Button.toolbar">
+      <Setter Property="MinWidth" Value="34" />
+      <Setter Property="Height" Value="30" />
+      <Setter Property="Padding" Value="9,4" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="CornerRadius" Value="2" />
+    </Style>
+    <Style Selector="Button.toolbar:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#F0F1F2" />
+    </Style>
+    <Style Selector="Button.action">
+      <Setter Property="Height" Value="38" />
+      <Setter Property="Padding" Value="18,0" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Background" Value="#FFFFFF" />
+      <Setter Property="BorderBrush" Value="#CACAC5" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+    </Style>
+    <Style Selector="Button.problem">
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="12,7" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="Button.problem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#EEEFEF" />
+    </Style>
+    <Style Selector="Border.panel">
+      <Setter Property="Background" Value="#FAFAF8" />
+      <Setter Property="BorderBrush" Value="#E5E5E2" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*,5,190,28">
+    <Menu Grid.Row="0" Background="#FAFAF8" BorderBrush="#E5E5E2" BorderThickness="0,0,0,1">
+      <MenuItem Header="_File">
+        <MenuItem Header="New Project" Click="HandleNewProject" />
+        <MenuItem Header="New Model" Click="HandleNewClass" />
+        <MenuItem Header="New Package" Tag="Package" Click="HandleNewClass" />
+        <Separator />
+        <MenuItem Header="Open Project…" Click="HandleOpenProject" />
+        <MenuItem Header="Open Modelica File…" Click="HandleOpenModelicaFile" />
+        <MenuItem Header="Open Modelica Library…" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Save" IsEnabled="{Binding HasActiveDocument}" Click="HandleSave" />
+        <MenuItem Header="Save All" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Exit" Click="HandleExit" />
+      </MenuItem>
+      <MenuItem Header="_Edit">
+        <MenuItem Header="Undo" IsEnabled="{Binding HasActiveDocument}" Click="HandleUndo" />
+        <MenuItem Header="Redo" IsEnabled="{Binding HasActiveDocument}" Click="HandleRedo" />
+        <Separator />
+        <MenuItem Header="Cut" IsEnabled="{Binding HasActiveDocument}" Click="HandleCut" />
+        <MenuItem Header="Copy" IsEnabled="{Binding HasActiveDocument}" Click="HandleCopy" />
+        <MenuItem Header="Paste" IsEnabled="{Binding HasActiveDocument}" Click="HandlePaste" />
+        <Separator />
+        <MenuItem Header="Delete Selected Component" IsEnabled="{Binding CanDeleteSelectedComponent}" Click="HandleDeleteSelectedComponent" />
+        <MenuItem Header="Delete Selected Connection" IsEnabled="{Binding CanDeleteSelectedConnection}" Click="HandleDeleteSelectedComponent" />
+        <MenuItem Header="Duplicate Selected Component(s)" InputGesture="Ctrl+D"
+                  IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleDuplicateSelectedComponents" />
+        <MenuItem Header="Rotate Left 90°" IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleRotateSelectedCounterClockwise" />
+        <MenuItem Header="Rotate Right 90°" IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleRotateSelectedClockwise" />
+        <MenuItem Header="Connection Tool" IsEnabled="{Binding CanUseConnectionTool}"
+                  IsChecked="{Binding IsConnectionToolActive}" Click="HandleToggleConnectionTool" />
+        <Separator />
+        <MenuItem Header="Find…" IsEnabled="{Binding HasActiveDocument}" Click="HandleFind" />
+      </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="Library Browser" IsChecked="True" />
+        <MenuItem Header="Project Browser" IsChecked="True" />
+        <MenuItem Header="Messages" IsChecked="True" />
+        <MenuItem Header="Reset Layout" IsEnabled="False" />
+      </MenuItem>
+      <MenuItem Header="_Model">
+        <MenuItem Header="Check Model" Command="{Binding CheckModelCommand}" />
+        <MenuItem Header="Instantiate Model" IsEnabled="{Binding IsEngineAvailable}" />
+      </MenuItem>
+      <MenuItem Header="_Simulation">
+        <MenuItem Header="Simulation Setup…" IsEnabled="{Binding HasActiveDocument}" Click="HandleSimulationSetup" />
+        <MenuItem Header="Simulate" Command="{Binding SimulateCommand}" />
+        <MenuItem Header="Stop Simulation" Command="{Binding StopSimulationCommand}" />
+        <MenuItem Header="Results" Command="{Binding ShowResultsCommand}" />
+      </MenuItem>
+      <MenuItem Header="_Libraries">
+        <MenuItem Header="Load Library…" IsEnabled="False" />
+        <MenuItem Header="Modelica Standard Library" IsEnabled="{Binding IsEngineAvailable}" />
+      </MenuItem>
+      <MenuItem Header="_Tools">
+        <MenuItem Header="Choose OpenModelica Executable…" Click="HandleConfigureOpenModelica" />
+        <MenuItem Header="Preferences" IsEnabled="False" />
+        <MenuItem Header="Diagnostics" IsEnabled="False" />
+      </MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="Documentation" IsEnabled="False" />
+        <MenuItem Header="About" IsEnabled="False" />
+      </MenuItem>
+    </Menu>
+
+    <Border Grid.Row="1" Height="44" Background="#FFFFFF" BorderBrush="#E5E5E2" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,1,Auto,1,Auto,*,Auto" Margin="8,0">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
+          <Button Classes="toolbar" Content="＋" ToolTip.Tip="New project" Click="HandleNewProject" />
+          <Button Classes="toolbar" Content="⌘O" ToolTip.Tip="Open Modelica file" Click="HandleOpenModelicaFile" />
+          <Button Classes="toolbar" Content="⌘S" ToolTip.Tip="Save" IsEnabled="{Binding HasActiveDocument}" Click="HandleSave" />
+        </StackPanel>
+        <Border Grid.Column="1" Width="1" Height="22" Background="#E5E5E2" Margin="8,0" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
+          <Button Classes="toolbar" Content="↶" ToolTip.Tip="Undo source or graphical edit" IsEnabled="{Binding HasActiveDocument}" Click="HandleUndo" />
+          <Button Classes="toolbar" Content="↷" ToolTip.Tip="Redo source or graphical edit" IsEnabled="{Binding HasActiveDocument}" Click="HandleRedo" />
+        </StackPanel>
+        <Border Grid.Column="3" Width="1" Height="22" Background="#E5E5E2" Margin="8,0" />
+        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
+          <Button Classes="toolbar" Content="Select / Move" ToolTip.Tip="Select components and drag local components on the Modelica grid"
+                  IsEnabled="{Binding CanSelectGraphicalElements}" />
+          <Button Classes="toolbar" Content="Delete" ToolTip.Tip="Delete the selected local component or connection"
+                  IsEnabled="{Binding CanDeleteGraphicalSelection}" Click="HandleDeleteSelectedComponent" />
+          <Button Classes="toolbar" Content="Duplicate" ToolTip.Tip="Duplicate the selected component(s) with exact modifiers and internal connections"
+                  IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleDuplicateSelectedComponents" />
+          <Button Classes="toolbar" Content="↺" ToolTip.Tip="Rotate selected component left 90 degrees"
+                  IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleRotateSelectedCounterClockwise" />
+          <Button Classes="toolbar" Content="↻" ToolTip.Tip="Rotate selected component right 90 degrees"
+                  IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleRotateSelectedClockwise" />
+          <Button Classes="toolbar" Content="{Binding ConnectionToolLabel}"
+                  ToolTip.Tip="Create a Modelica connect equation by choosing two compatible connectors"
+                  IsEnabled="{Binding CanUseConnectionTool}" Click="HandleToggleConnectionTool" />
+          <Button Classes="toolbar" Content="Check" ToolTip.Tip="Check active Modelica model" Command="{Binding CheckModelCommand}" />
+          <Button Classes="toolbar" Content="▶  Simulate" ToolTip.Tip="Simulate active model" Command="{Binding SimulateCommand}"
+                  Background="#263746" Foreground="#FFFFFF" Padding="14,4" />
+          <Button Classes="toolbar" Content="■" ToolTip.Tip="Cancel simulation" Command="{Binding StopSimulationCommand}" />
+        </StackPanel>
+        <Button Grid.Column="6" Classes="toolbar" Content="Engine" Command="{Binding RetryEngineCommand}"
+                ToolTip.Tip="Retry OpenModelica connection" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="2" ColumnDefinitions="260,5,*,5,320">
+      <Border Grid.Column="0" Classes="panel" BorderThickness="0,0,1,0">
+        <Grid RowDefinitions="Auto,Auto,*">
+          <StackPanel Margin="16,14,16,10" Spacing="10">
+            <Grid ColumnDefinitions="*,*">
+              <TextBlock Grid.Column="0" Classes="section" Text="{Binding CurrentProjectName}" />
+              <TextBlock Grid.Column="1" Classes="section" Text="LIBRARIES" Foreground="#111111" />
+            </Grid>
+            <TextBox PlaceholderText="Filter top-level classes"
+                     Text="{Binding LibrarySearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Height="32"
+                     IsEnabled="{Binding IsEngineAvailable}" />
+          </StackPanel>
+          <Border Grid.Row="1" BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" />
+          <ScrollViewer Grid.Row="2">
+            <StackPanel Margin="10" Spacing="2">
+              <Grid ColumnDefinitions="Auto,*" Margin="5,8" IsVisible="{Binding IsEngineAvailable}">
+                <TextBlock Text="▾" Margin="0,0,8,0" />
+                <TextBlock Grid.Column="1" Text="Modelica" FontWeight="SemiBold" />
+              </Grid>
+              <TextBlock Margin="5,0,5,6" Text="Drag the ⠿ handle of a model, block, connector, record, or class into Diagram view."
+                         FontSize="10" Foreground="#777773" TextWrapping="Wrap"
+                         IsVisible="{Binding CanInsertLibraryComponent}" />
+              <TreeView ItemsSource="{Binding VisibleLibraryClasses}">
+                <TreeView.Styles>
+                  <Style Selector="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="{ReflectionBinding IsExpanded, Mode=TwoWay}" />
+                  </Style>
+                </TreeView.Styles>
+                <TreeView.ItemTemplate>
+                  <TreeDataTemplate x:DataType="vm:LibraryNodeViewModel" ItemsSource="{Binding Children}">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="3,4">
+                      <Border Grid.Column="0" Margin="0,0,7,0" Padding="2,0" Background="Transparent"
+                              IsVisible="{Binding CanInstantiate}"
+                              ToolTip.Tip="Drag into the active Diagram"
+                              PointerPressed="HandleLibraryDragPointerPressed">
+                        <TextBlock Text="⠿" Foreground="#637383" FontSize="13" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#222222" />
+                      <TextBlock Grid.Column="2" Text="…" Margin="8,0" Foreground="#777773"
+                                 IsVisible="{Binding IsLoading}" />
+                      <TextBlock Grid.Column="3" Text="{Binding KindLabel}" FontSize="9" Foreground="#8A8A86" />
+                    </Grid>
+                  </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+              </TreeView>
+              <TextBlock Margin="8,14" Text="Library browsing becomes available when OpenModelica is connected."
+                         Foreground="#777773" TextWrapping="Wrap" IsVisible="{Binding IsEngineUnavailable}" />
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <GridSplitter Grid.Column="1" Background="#E5E5E2" ResizeDirection="Columns" />
+
+      <Border Grid.Column="2" Background="#FFFFFF">
+        <Grid>
+        <ScrollViewer IsVisible="{Binding ShowWelcome}">
+          <Grid Margin="54,46" MaxWidth="920" HorizontalAlignment="Center" ColumnDefinitions="*,32,310">
+            <StackPanel Grid.Column="0" Spacing="20" VerticalAlignment="Top">
+              <TextBlock Classes="section" Text="MODELICA ENGINEERING ENVIRONMENT" />
+              <TextBlock Text="{Binding ProductName}" FontSize="40" FontWeight="SemiBold" Foreground="#111111" />
+              <TextBlock Text="Build, inspect, validate, and simulate standards-based Modelica systems in one focused workspace."
+                         FontSize="17" Foreground="#646464" TextWrapping="Wrap" MaxWidth="600" />
+              <Grid Margin="0,16,0,0" ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto,12,Auto">
+                <Button Grid.Row="0" Grid.Column="0" Classes="action" Content="New Project" Click="HandleNewProject" />
+                <Button Grid.Row="0" Grid.Column="2" Classes="action" Content="Open Project" Click="HandleOpenProject" />
+                <Button Grid.Row="2" Grid.Column="0" Classes="action" Content="Open Modelica File" Click="HandleOpenModelicaFile" />
+                <Button Grid.Row="2" Grid.Column="2" Classes="action" Content="New Model" Click="HandleNewClass" />
+                <Button Grid.Row="4" Grid.Column="0" Classes="action" Content="Load Modelica Library" IsEnabled="False" />
+              </Grid>
+              <Border Margin="0,18,0,0" BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Padding="0,18,0,0">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="section" Text="RECENT PROJECTS" />
+                  <TextBlock Text="No recent projects" Foreground="#8A8A86" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <Border Grid.Column="2" Background="#F7F7F5" BorderBrush="#CACAC5" BorderThickness="1" CornerRadius="2" Padding="20">
+              <StackPanel Spacing="12">
+                <TextBlock Classes="section" Text="OPENMODELICA ENGINE" />
+                <Grid ColumnDefinitions="Auto,*">
+                  <TextBlock Text="●" Foreground="#A2772D" FontSize="14" Margin="0,1,9,0" />
+                  <TextBlock Grid.Column="1" Text="{Binding EngineStatus}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+                </Grid>
+                <TextBlock Text="{Binding EngineDetail}" Foreground="#646464" TextWrapping="Wrap" FontSize="12" />
+                <Border BorderBrush="#DEDED9" BorderThickness="0,1,0,0" Margin="0,4,0,0" Padding="0,12,0,0"
+                        IsVisible="{Binding IsEngineUnavailable}">
+                  <StackPanel Spacing="10">
+                    <TextBlock Text="OpenModelica Engine Required for Simulation" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Text="Source editing remains available. Install OpenModelica or configure the omc executable to enable validation and simulation."
+                               Foreground="#646464" TextWrapping="Wrap" FontSize="12" />
+                    <Button Classes="action" Content="Choose omc Executable…" Click="HandleConfigureOpenModelica" />
+                    <Button Classes="action" Content="Retry Detection" Command="{Binding RetryEngineCommand}" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </ScrollViewer>
+          <Grid IsVisible="{Binding HasActiveDocument}" RowDefinitions="46,*,28">
+            <Border Grid.Row="0" Background="#FAFAF8" BorderBrush="#E5E5E2" BorderThickness="0,0,0,1">
+              <Grid ColumnDefinitions="Auto,*,Auto" Margin="12,0">
+                <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#CACAC5" BorderThickness="1,1,1,0"
+                        Padding="16,0" VerticalAlignment="Bottom" Height="34">
+                  <TextBlock Text="{Binding DocumentTabTitle}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                </Border>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
+                  <Button Classes="toolbar" Content="Diagram" Command="{Binding ShowDiagramCommand}" />
+                  <Button Classes="toolbar" Content="Icon" Command="{Binding ShowIconCommand}" />
+                  <Button Classes="toolbar" Content="Modelica Text" Command="{Binding ShowTextCommand}" />
+                  <Button Classes="toolbar" Content="Results" Command="{Binding ShowResultsCommand}" />
+                  <Button Classes="toolbar" Content="Documentation" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Grid Grid.Row="1">
+              <controls:ModelicaTextEditor x:Name="SourceEditor"
+                                           IsVisible="{Binding IsTextView}"
+                                           FontFamily="SFMono-Regular, Menlo, Consolas, monospace"
+                                           FontSize="13"
+                                           Background="#FFFFFF"
+                                           Foreground="#171717"
+                                           Padding="8,12"
+                                           HorizontalScrollBarVisibility="Auto"
+                                           VerticalScrollBarVisibility="Auto" />
+              <controls:ModelicaGraphicsView Snapshot="{Binding ActiveGraphicalAnnotation}"
+                                             InstanceSnapshot="{Binding ActiveModelInstance}"
+                                             SelectedComponent="{Binding SelectedComponent}"
+                                             SelectedComponents="{Binding SelectedComponents}"
+                                             SelectedConnection="{Binding SelectedConnection}"
+                                             ShowIcon="{Binding IsIconView}"
+                                             IsGraphicalEditingEnabled="{Binding CanEditGraphically}"
+                                             IsConnectionToolActive="{Binding IsConnectionToolActive}"
+                                             GraphicalSelectionChanged="HandleGraphicalSelectionChanged"
+                                             ComponentPlacementRequested="HandleComponentPlacementRequested"
+                                             ComponentDropRequested="HandleComponentDropRequested"
+                                             ComponentDeletionRequested="HandleComponentDeletionRequested"
+                                             ComponentDuplicationRequested="HandleComponentDuplicationRequested"
+                                             ConnectionCreationRequested="HandleConnectionCreationRequested"
+                                             ConnectionRouteRequested="HandleConnectionRouteRequested"
+                                             ConnectionDeletionRequested="HandleConnectionDeletionRequested"
+                                             IsVisible="{Binding IsGraphicalView}"
+                                             ClipToBounds="True" />
+              <Border IsVisible="{Binding IsResultsView}" Background="#FFFFFF" Padding="28">
+                <Grid RowDefinitions="Auto,18,*">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="5">
+                      <TextBlock Text="SIMULATION RESULTS" Classes="section" />
+                      <TextBlock Text="{Binding ActiveModelName}" FontSize="24" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding SimulationConfigurationSummary}" Foreground="#646464" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
+                      <TextBlock Text="{Binding SimulationStatus}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                      <TextBlock Text="{Binding SimulationElapsed}" Foreground="#646464" HorizontalAlignment="Right" />
+                    </StackPanel>
+                  </Grid>
+                  <Grid Grid.Row="2" ColumnDefinitions="280,16,*">
+                    <Border BorderBrush="#E5E5E2" BorderThickness="1" Padding="12">
+                      <Grid RowDefinitions="Auto,8,*">
+                        <TextBlock Text="RESULT VARIABLES" Classes="section" />
+                        <ListBox Grid.Row="2" ItemsSource="{Binding SimulationVariables}"
+                                 SelectionMode="Multiple" SelectionChanged="HandleSimulationVariableSelection" />
+                      </Grid>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="#E5E5E2" BorderThickness="1" Background="#FAFAF8" Padding="20">
+                      <Grid>
+                        <lvc:CartesianChart Series="{Binding ResultSeries}"
+                                            XAxes="{Binding ResultXAxes}"
+                                            YAxes="{Binding ResultYAxes}"
+                                            ZoomMode="X"
+                                            LegendPosition="Right"
+                                            AnimationsSpeed="0:0:0.15"
+                                            IsVisible="{Binding HasResultSeries}" />
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" MaxWidth="420"
+                                    IsVisible="{Binding !HasResultSeries}">
+                          <TextBlock Text="Select a result variable" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                          <TextBlock Text="{Binding ResultPlotStatus}"
+                                     Foreground="#646464" TextAlignment="Center" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding SimulationResultFile}" FontSize="10" Foreground="#777773"
+                                     TextAlignment="Center" TextWrapping="Wrap" Margin="0,10,0,0" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </Grid>
+                </Grid>
+              </Border>
+            </Grid>
+            <Border Grid.Row="2" Background="#FAFAF8" BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Padding="12,0">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding DocumentPath}" VerticalAlignment="Center" FontSize="11" Foreground="#646464" />
+                <TextBlock Grid.Column="1" Text="{Binding ActiveViewLabel}" VerticalAlignment="Center" FontSize="11" Foreground="#646464" />
+              </Grid>
+            </Border>
+          </Grid>
+        </Grid>
+      </Border>
+
+      <GridSplitter Grid.Column="3" Background="#E5E5E2" ResizeDirection="Columns" />
+
+      <Border Grid.Column="4" Classes="panel" BorderThickness="1,0,0,0">
+        <StackPanel>
+          <TextBlock Classes="section" Text="INSPECTOR" Margin="16,16,16,12" />
+          <Border BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" />
+          <StackPanel Margin="16" Spacing="10" IsVisible="{Binding ShowWelcome}">
+            <TextBlock Text="No selection" FontWeight="SemiBold" />
+            <TextBlock Text="Select a model, component, connection, or simulation variable to inspect its properties."
+                       Foreground="#777773" TextWrapping="Wrap" FontSize="12" />
+          </StackPanel>
+          <StackPanel Margin="16" Spacing="12" IsVisible="{Binding HasActiveDocument}">
+            <StackPanel Spacing="12" IsVisible="{Binding HasNoGraphicalSelection}">
+              <TextBlock Text="MODEL" Classes="section" />
+              <TextBlock Text="{Binding ActiveModelName}" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding DocumentPath}" FontSize="11" Foreground="#646464" TextWrapping="Wrap" />
+              <Border BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Margin="0,6,0,0" />
+              <TextBlock Text="Open a Diagram or Icon view and click a placed component or connection to inspect its compiler-derived properties."
+                         FontSize="12" Foreground="#777773" TextWrapping="Wrap" />
+              <Border BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Margin="0,4,0,0" Padding="0,12,0,0">
+                <StackPanel Spacing="7">
+                  <TextBlock Text="{Binding SourceOutlineTitle}" Classes="section" />
+                  <TextBlock Text="{Binding WithinPackageLabel}" FontSize="11" Foreground="#777773" />
+                  <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding SourceOutline}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="modeling:ModelicaSourceSymbol">
+                          <Grid ColumnDefinitions="76,*,Auto" Margin="0,3">
+                            <TextBlock Text="{Binding Kind}" FontSize="9" Foreground="#777773" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1">
+                              <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" />
+                              <TextBlock Text="{Binding TypeName}" FontSize="10" Foreground="#777773" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding Line}" FontSize="10" Foreground="#8A8A86" VerticalAlignment="Center" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                  <TextBlock Text="{Binding SourceAnalysisIssuesText}"
+                             IsVisible="{Binding HasSourceAnalysisIssues}"
+                             FontSize="11" Foreground="#9B2C2C" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <StackPanel Spacing="10" IsVisible="{Binding HasGraphicalSelection}">
+              <TextBlock Text="{Binding GraphicalSelection.Kind}" Classes="section" />
+              <TextBlock Text="{Binding GraphicalSelection.Title}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding GraphicalSelection.Subtitle}" FontSize="11" Foreground="#646464" TextWrapping="Wrap" />
+              <Border BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Margin="0,5,0,2" />
+              <ItemsControl ItemsSource="{Binding GraphicalSelection.Properties}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:InspectorPropertyViewModel">
+                    <Grid RowDefinitions="Auto,Auto" Margin="0,4">
+                      <TextBlock Text="{Binding Name}" Classes="section" FontSize="9" />
+                      <TextBlock Grid.Row="1" Text="{Binding Value}" FontSize="12" Foreground="#222222"
+                                 TextWrapping="Wrap" Margin="0,2,0,0" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Border BorderBrush="#E5E5E2" BorderThickness="0,1,0,0" Margin="0,6,0,0" />
+              <TextBlock Text="Drag a local component to move it, drag a corner handle to resize it, or drag the round handle to rotate in 15° steps. For a selected connection, drag a circular segment handle to reroute it."
+                         FontSize="11" Foreground="#777773" TextWrapping="Wrap" />
+              <Button Classes="action" Content="Delete Selected Component"
+                      IsEnabled="{Binding CanDeleteSelectedComponent}" Click="HandleDeleteSelectedComponent" />
+              <Button Classes="action" Content="Delete Selected Connection"
+                      IsEnabled="{Binding CanDeleteSelectedConnection}" Click="HandleDeleteSelectedComponent" />
+              <Button Classes="action" Content="Duplicate Selected Component(s)"
+                      IsEnabled="{Binding CanMoveSelectedComponent}" Click="HandleDuplicateSelectedComponents" />
+              <TextBlock Text="{Binding SelectedGraphicalEditHint}"
+                         FontSize="11" Foreground="#777773" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <GridSplitter Grid.Row="3" Background="#E5E5E2" ResizeDirection="Rows" />
+
+    <Border Grid.Row="4" Background="#FAFAF8" BorderBrush="#E5E5E2" BorderThickness="0,1,0,0">
+      <TabControl>
+        <TabItem Header="Messages">
+          <ScrollViewer>
+            <TextBlock Margin="16" Text="{Binding MessagesText}" Foreground="#555552" TextWrapping="Wrap" />
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="Compiler">
+          <TextBlock Margin="16" Text="OpenModelica compiler output" Foreground="#777773" />
+        </TabItem>
+        <TabItem Header="Simulation">
+          <Grid ColumnDefinitions="260,*">
+            <Border Padding="16" BorderBrush="#E5E5E2" BorderThickness="0,0,1,0">
+              <StackPanel Spacing="8">
+                <TextBlock Text="SIMULATION" Classes="section" />
+                <TextBlock Text="{Binding SimulationStatus}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding SimulationConfigurationSummary}" FontSize="11" Foreground="#646464" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding SimulationElapsed}" FontSize="11" Foreground="#646464" />
+              </StackPanel>
+            </Border>
+            <ScrollViewer Grid.Column="1">
+              <TextBlock Margin="16" Text="{Binding SimulationOutput}" Foreground="#555552" TextWrapping="Wrap"
+                         FontFamily="SFMono-Regular, Menlo, Consolas, monospace" FontSize="11" />
+            </ScrollViewer>
+          </Grid>
+        </TabItem>
+        <TabItem Header="{Binding ProblemsTabTitle}">
+          <Grid RowDefinitions="Auto,*">
+            <Border Padding="12,7" Background="#FFF8E8" BorderBrush="#E7D6AA" BorderThickness="0,0,0,1"
+                    IsVisible="{Binding ProblemsAreStale}">
+              <TextBlock Text="{Binding ProblemsStateText}" FontSize="11" Foreground="#765519" />
+            </Border>
+            <TextBlock Grid.Row="1" Margin="16" Text="{Binding ProblemsStateText}" Foreground="#777773"
+                       IsVisible="{Binding HasNoProblems}" />
+            <ScrollViewer Grid.Row="1" IsVisible="{Binding HasProblems}">
+              <ItemsControl ItemsSource="{Binding Problems}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CompilerProblemViewModel">
+                    <Button Classes="problem" Tag="{Binding}" IsEnabled="{Binding IsNavigable}"
+                            Click="HandleProblemClick">
+                      <Grid ColumnDefinitions="86,*,170">
+                        <TextBlock Text="{Binding Severity}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding SeverityColor}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Diagnostic.Message}" FontSize="12"
+                                   TextTrimming="CharacterEllipsis" Margin="0,0,16,0" />
+                        <TextBlock Grid.Column="2" Text="{Binding LocationLabel}" FontSize="11"
+                                   Foreground="#646464" TextTrimming="CharacterEllipsis" />
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </TabItem>
+      </TabControl>
+    </Border>
+
+    <Border Grid.Row="5" Background="#26313A" Padding="10,0">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+        <TextBlock Text="{Binding ActiveModelName}" Foreground="#D6DADD" VerticalAlignment="Center" FontSize="12" />
+        <TextBlock Grid.Column="2" Text="{Binding StatusMessage}" Foreground="#D6DADD" VerticalAlignment="Center" FontSize="12" />
+        <TextBlock Grid.Column="3" Text="100%" Foreground="#D6DADD" VerticalAlignment="Center" FontSize="12" Margin="22,0,0,0" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

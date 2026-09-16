@@ -1,0 +1,55 @@
+{
+  "name": "M",
+  "restriction": "model",
+  "elements": [
+    {
+      "$kind": "extends",
+      "baseClass": {
+        "name": "Icons.Example",
+        "restriction": "model",
+        "prefixes": { "partial": true },
+        "annotation": {
+          "Icon": {
+            "coordinateSystem": {
+              "preserveAspectRatio": false,
+              "extent": [[-100, -100], [100, 100]]
+            },
+            "graphics": [
+              {
+                "$kind": "record",
+                "name": "Ellipse",
+                "elements": [
+                  {
+                    "$kind": "cref",
+                    "parts": [{ "name": "visible" }]
+                  },
+                  [0, 0],
+                  0,
+                  [75, 138, 73],
+                  [255, 255, 255],
+                  { "$kind": "enum", "name": "LinePattern.Solid", "index": 2 },
+                  { "$kind": "enum", "name": "FillPattern.Solid", "index": 2 },
+                  0.25,
+                  [[-100, -100], [100, 100]],
+                  0,
+                  360,
+                  { "$kind": "enum", "name": "EllipseClosure.Chord", "index": 2 }
+                ]
+              }
+            ]
+          },
+          "IconMap": {
+            "extent": [[0, 0], [0, 0]]
+          }
+        }
+      }
+    }
+  ],
+  "annotation": {
+    "Icon": {
+      "coordinateSystem": {
+        "preserveAspectRatio": true
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <ApplicationTitle>Modelica Studio</ApplicationTitle>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ModelicaStudio.Application/ModelicaStudio.Application.csproj" />
+    <ProjectReference Include="../ModelicaStudio.Infrastructure/ModelicaStudio.Infrastructure.csproj" />
+    <ProjectReference Include="../ModelicaStudio.OpenModelica/ModelicaStudio.OpenModelica.csproj" />
+    <ProjectReference Include="../ModelicaStudio.UI/ModelicaStudio.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+  </ItemGroup>
+</Project>

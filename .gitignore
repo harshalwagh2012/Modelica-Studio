@@ -1,0 +1,17 @@
+.DS_Store
+.dotnet/
+.dotnet-home/
+.nuget/
+.idea/
+.vs/
+.vscode/
+**/bin/
+**/obj/
+TestResults/
+artifacts/
+*.user
+*.suo
+*.log
+*.mat
+*.csv
+*.exe
